@@ -54,3 +54,7 @@ flowchart TD
 - In order for a word to be valid, the rack must _always_ be used. 
     - If there is a valid word in the `word` input, however no word can be formed by using the rack, then we show an error.
 
+### Running Tests
+
+There are also tests written for the different hooks and components in this app. If you'd like to run them, simply run `npm test`. 
+The tests are using `jest` as the runner and use the different modules of `testing-library/react` to have tools to render and manipulate the differnet components.
