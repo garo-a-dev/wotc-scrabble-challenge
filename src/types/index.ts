@@ -1,0 +1,1 @@
+export type LetterDataRecord = Record<string, { tiles: number; score: number }>;
