@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import letterData from '../assets/letter_data.json';
 
 /**
@@ -87,7 +87,12 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
   const [score, setScore] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+  const dictRef = useRef<string[] | null>(null);
+  
+  
+  /**
+   * Clears the best word, score, and error states.
+   */
   const clearFindWord = () => {
     setLoading(false);
     setScore(-1);
@@ -95,45 +100,59 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
     setBestWord(null);
   }
 
+  // Fetch dictionary and store it in a ref.
   useEffect(() => {
-    if (!isPlaying) return;
-    setLoading(true);
-
+    if (dictRef.current) return; // Already loaded
     fetch('/src/assets/dictionary.text')
       .then((res: Response) => res.text())
       .then((text: string) => {
-        const dict: string[] = text.split(/\r?\n/).map((w: string) => w.trim()).filter(Boolean);
-        let maxScore: number = -1;
-        let maxWord: string | null = null;
-        for (const candidate of dict) {
-          if (canForm(candidate.toUpperCase(), rack.toUpperCase(), word.toUpperCase())) {
-            // Getting here means that we found a potentially valid word.
-            // First, we check the score of the candidate.
-            const candidateScore: number = scoreWord(candidate);
-            // If the candidate score is the same as the max score and the candidate is lexicographically less than the max word, then we update the max word.
-            if (!!maxWord && candidateScore === maxScore && candidate.localeCompare(maxWord) < 0) {
-              maxWord = candidate;
-            }
-            // If the candidate score is greater than the max score, then we update the max score and the max word.
-            if (candidateScore > maxScore) {
-              maxScore = candidateScore;
-              maxWord = candidate;
-            }
-          }
-        }
-        if (maxScore === -1) {
-            setError("No valid word found");
-            setLoading(false);
-            return;
-        }
-        setBestWord(maxWord);
-        setScore(maxScore);
-        setLoading(false);
+        dictRef.current = text.split(/\r?\n/).map((w: string) => w.trim()).filter(Boolean);
       })
       .catch(() => {
         setError('Failed to load dictionary');
-        setLoading(false);
       });
+  }, []);
+
+  // Game Logic
+  useEffect(() => {
+    // If the game is not playing, then we don't need to find a word.
+    if (!isPlaying) return;
+
+    // If the dictionary is not loaded, then we need to load it.
+    if (!dictRef.current) {
+      setLoading(true);
+      return;
+    }
+    setLoading(true);
+
+    const dict = dictRef.current;
+    let maxScore: number = -1;
+    let maxWord: string | null = null;
+    // Iterate through the dictionary and find the best word.
+    for (const candidate of dict) {
+      if (canForm(candidate.toUpperCase(), rack.toUpperCase(), word.toUpperCase())) {
+        // Getting here means that we found a potentially valid word.
+        // First, we check the score of the candidate.
+        const candidateScore: number = scoreWord(candidate);
+        // If the candidate score is the same as the max score and the candidate is lexicographically less than the max word, then we update the max word.
+        if (!!maxWord && candidateScore === maxScore && candidate.localeCompare(maxWord) < 0) {
+          maxWord = candidate;
+        }
+        // If the candidate score is greater than the max score, then we update the max score and the max word.
+        if (candidateScore > maxScore) {
+          maxScore = candidateScore;
+          maxWord = candidate;
+        }
+      }
+    }
+    if (maxScore === -1) {
+        setError("No valid word found");
+        setLoading(false);
+        return;
+    }
+    setBestWord(maxWord);
+    setScore(maxScore);
+    setLoading(false);
   }, [rack, word, isPlaying]);
 
   return { bestWord, loading, error, score, clearFindWord };

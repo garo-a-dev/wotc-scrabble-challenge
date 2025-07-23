@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { LetterDataRecord } from "../types";
-import letterData from '../assets/letter_data.json';
+import letterDataJson from '../assets/letter_data.json';
 
 
 const MIN_RACK_LENGTH = 1;
@@ -77,11 +77,11 @@ const useValidation = (rack: string, word: string = '', isPlaying: boolean): Use
         // Finally, check is the tiles count for any letter exceeds the count in the letterData
         const allTiles: string[] = rack.split('').concat(word.split(''));
         const tileCount: Record<string, number> = groupByLetter(allTiles);
-        const letterDataRecord: LetterDataRecord = letterData as LetterDataRecord;
+        const letterData: LetterDataRecord = letterDataJson as LetterDataRecord;
 
         for (const [letter, count] of Object.entries(tileCount)) {
-            if (count > letterDataRecord[letter]?.tiles) {
-                errors.game.push(`Game cannot have more than ${letterDataRecord[letter].tiles} tiles of ${letter}`)
+            if (count > letterData[letter]?.tiles) {
+                errors.game.push(`Game cannot have more than ${letterData[letter].tiles} tiles of ${letter}`)
                 currentValidity = false;
             }
         }
