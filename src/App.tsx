@@ -97,7 +97,7 @@ const App: React.FC = () => {
             onClick={handlePlay}
             disabled={loading}
           >
-            Play
+            {loading ? "Loading..." : "Play"}
           </button>
         </div>
         <div className="flex flex-col gap-2">

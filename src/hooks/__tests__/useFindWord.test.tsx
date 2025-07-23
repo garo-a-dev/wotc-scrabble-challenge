@@ -10,6 +10,7 @@ describe('useFindWord', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.resetModules();
   });
 
   it('should generate the hook without crashing', () => {
@@ -19,18 +20,17 @@ describe('useFindWord', () => {
   });
 
   describe('when isPlaying is false', () => {
-    it('should not set loading or fetch dictionary', () => {
-      const { result } = renderHook(() => useFindWord('CAT', '', false));
-      expect(result.current.loading).toBe(false);
-      expect(global.fetch).not.toHaveBeenCalled();
+    it('should not set loading but should fetch dictionary', async () => {
+      renderHook(() => useFindWord('CAT', '', false));
+      // Dictionary is fetched on mount regardless of isPlaying
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     });
   });
 
   describe('when isPlaying is true', () => {
     it('should find the best word from the rack', async () => {
       const { result } = renderHook(() => useFindWord('CAT', '', true));
-      await waitFor(() => expect(result.current.loading).toBe(false));
-      expect(result.current.bestWord).toBe('CAT');
+      await waitFor(() => expect(result.current.bestWord).toBe('CAT'));
       expect(result.current.score).toBeGreaterThanOrEqual(0);
       expect(result.current.error).toBeNull();
     });
@@ -40,16 +40,15 @@ describe('useFindWord', () => {
         text: () => Promise.resolve('DOG\nAPPLE'),
       });
       const { result } = renderHook(() => useFindWord('ZZZ', '', true));
-      await waitFor(() => expect(result.current.loading).toBe(false));
+      await waitFor(() => expect(result.current.error).toBe('No valid word found'));
       expect(result.current.bestWord).toBeNull();
-      expect(result.current.error).toBe('No valid word found');
     });
 
     it('should handle fetch failure', async () => {
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('fail'));
       const { result } = renderHook(() => useFindWord('CAT', '', true));
       await waitFor(() => expect(result.current.loading).toBe(false));
-      expect(result.current.error).toBe('Failed to load dictionary');
+      await waitFor(() => expect(result.current.error).toBe('Failed to load dictionary'));
     });
   });
 

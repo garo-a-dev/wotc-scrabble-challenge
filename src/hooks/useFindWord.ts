@@ -87,8 +87,8 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
   const [score, setScore] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const dictRef = useRef<string[] | null>(null);
   
+  const dictRef = useRef<string[] | null>(null);
   
   /**
    * Clears the best word, score, and error states.
@@ -103,13 +103,16 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
   // Fetch dictionary and store it in a ref.
   useEffect(() => {
     if (dictRef.current) return; // Already loaded
+    setLoading(true);
     fetch('/src/assets/dictionary.text')
       .then((res: Response) => res.text())
       .then((text: string) => {
         dictRef.current = text.split(/\r?\n/).map((w: string) => w.trim()).filter(Boolean);
+        setLoading(false);
       })
       .catch(() => {
         setError('Failed to load dictionary');
+        setLoading(false);
       });
   }, []);
 
@@ -117,17 +120,16 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
   useEffect(() => {
     // If the game is not playing, then we don't need to find a word.
     if (!isPlaying) return;
-
-    // If the dictionary is not loaded, then we need to load it.
-    if (!dictRef.current) {
-      setLoading(true);
-      return;
-    }
-    setLoading(true);
-
+    // If we're still loading, then we don't need to find a word.
+    if (loading) return;
+    // If the dictionary is not loaded, then we need to load it. This shouldn't happen.
     const dict = dictRef.current;
+    if (dict === null) return;
+
+    setLoading(true);
     let maxScore: number = -1;
     let maxWord: string | null = null;
+    
     // Iterate through the dictionary and find the best word.
     for (const candidate of dict) {
       if (canForm(candidate.toUpperCase(), rack.toUpperCase(), word.toUpperCase())) {
@@ -153,7 +155,7 @@ const useFindWord = (rack: string, word: string = '', isPlaying: boolean): UseFi
     setBestWord(maxWord);
     setScore(maxScore);
     setLoading(false);
-  }, [rack, word, isPlaying]);
+  }, [rack, word, isPlaying, loading]);
 
   return { bestWord, loading, error, score, clearFindWord };
 };
