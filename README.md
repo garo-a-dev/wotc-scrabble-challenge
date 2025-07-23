@@ -31,6 +31,7 @@ Within a terminal application:
 ### `App.tsx`
 - [x] `rack` input to input the rack
 - [x] `word` input to input the optional word
+- [x] Results section to show results and errors
 ### `assets`
 - [x] Dictionary and letter data assets
 ### `useValidation.ts`
@@ -79,3 +80,7 @@ flowchart TD
 
 There are also tests written for the different hooks and components in this app. If you'd like to run them, simply run `npm test`. 
 The tests are using `jest` as the runner and use the different modules of `testing-library/react` to have tools to render and manipulate the differnet components.
+
+### Possible Optimizations
+
+- Using a dictionary with under 300 words for now for initial implementation. For larger dictionaries, a chunking layer might be recommended to run multiple chunks in parallel and then compare the results.
