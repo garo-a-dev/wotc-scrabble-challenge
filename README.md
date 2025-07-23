@@ -1,7 +1,7 @@
 # WOTC Scrabble Word Builder
 
 ## Purpose
-This application takes in a rack and a word as inputs to generate the best possible word for a Scrabble game based on dictionary of available words (found under `src/assets/dictionary.txt`) as well as some scoring rules for each letter (found under `src/assets/letter_data.json`).
+This application takes in a rack and a word as inputs to generate the highest scoring word for a Scrabble game based on dictionary of available words (found under `src/assets/dictionary.txt`) as well as some scoring rules for each letter (found under `src/assets/letter_data.json`).
 
 ## Techonlogies Used
 This app was built using React v19 through Vite (https://vite.dev/).
@@ -23,6 +23,27 @@ Within a terminal application:
 - Run `npm install` to install dependencies
 - Run `npm run dev` to start the local dev server
 - On any browser, visit: http://localhost:5173.
+
+## Requirements Checklist
+
+### `REAME.md`
+- [x] README file with how to run and implementation details
+### `App.tsx`
+- [x] `rack` input to input the rack
+- [x] `word` input to input the optional word
+### `assets`
+- [x] Dictionary and letter data assets
+### `useValidation.ts`
+- [x] Validation for `rack` length (1 - 7 characters)
+- [x] Validation for `rack` content (only letters)
+- [x] Validation for `word` content (only letters)
+- [x] Validation for total tile count in game
+### `useFindWord.ts`
+- [x] Logic for determining highest scoring word
+- [x] Logic to return alphabetized result in the case of same score results
+- [x] Validation for final result length 
+### Misc
+- [x] Unit tests
 
 ### Assumptions and Design Decisions
 
@@ -54,7 +75,7 @@ flowchart TD
 - In order for a word to be valid, the rack must _always_ be used. 
     - If there is a valid word in the `word` input, however no word can be formed by using the rack, then we show an error.
 
-### Running Tests
+## Running Tests
 
 There are also tests written for the different hooks and components in this app. If you'd like to run them, simply run `npm test`. 
 The tests are using `jest` as the runner and use the different modules of `testing-library/react` to have tools to render and manipulate the differnet components.

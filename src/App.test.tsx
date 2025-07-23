@@ -26,9 +26,16 @@ jest.mock('./hooks/useValidation', () => ({
 
 describe('App Component', () => {
   describe('Basic Rendering', () => {
-    it('renders without crashing', () => {
-      const { container } = render(<App />);
+    it('renders without crashing and displays key elements', () => {
+      const { container, getByTestId } = render(<App />);
       expect(container).toBeInTheDocument();
+      expect(getByTestId('app-container')).toBeInTheDocument();
+      expect(getByTestId('app-title')).toBeInTheDocument();
+      expect(getByTestId('input-container')).toBeInTheDocument();
+      expect(getByTestId('rack-input-container')).toBeInTheDocument();
+      expect(getByTestId('word-input-container')).toBeInTheDocument();
+      expect(getByTestId('play-button')).toBeInTheDocument();
+      expect(getByTestId('log-container')).toBeInTheDocument();
     });
   });
 

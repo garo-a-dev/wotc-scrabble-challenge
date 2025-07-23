@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import './App.css'
 import useFindWord, { type UseFindWordResult } from './hooks/useFindWord'
 import useValidation, { type UseFindValidationResult } from './hooks/useValidation'
 
 function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
-  const [stack, setStack] = useState<string>("")
+  const [rack, setRack] = useState<string>("")
   const [word, setWord] = useState<string>("")
 
   const handlePlay = () => {
@@ -19,7 +18,7 @@ function App() {
     isValid,
     validationError,
     clearValidation
-  }: UseFindValidationResult = useValidation(stack, word, isPlaying)
+  }: UseFindValidationResult = useValidation(rack, word, isPlaying)
 
   /* --- FIND WORD HOOK SETUP --- */
   const {
@@ -27,7 +26,7 @@ function App() {
     loading,
     error,
     score,
-    clearFindWord }: UseFindWordResult = useFindWord(stack, word, (isPlaying && isValid === true))
+    clearFindWord }: UseFindWordResult = useFindWord(rack, word, (isPlaying && isValid === true))
 
 
   /**
@@ -55,21 +54,63 @@ function App() {
   }, [bestWord, error, isPlaying, clearValidation])
 
   return (
-    <div className="flex items-center justify-center gap-4">
-      <div className="flex flex-col items-center justify-center">
-        <label>Stack</label>
-        <input type="text" className="w-full max-w-md p-2 border border-gray-300 rounded-md" onBlur={(e) => setStack(e.target.value)} disabled={loading} />
+    <div data-testid="app-container" className="w-full h-screen flex flex-col items-center justify-center gap-8">
+      <h1 data-testid="app-title" className="text-5xl font-bold">Scrabble Word Finder</h1>
+      <div data-testid="input-container" className="flex gap-20">
+        <div data-testid="rack-input-container" className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label>Rack*</label>
+            <input
+              type="text"
+              className={`w-[400px] p-2 border rounded-md ${
+                validationError && validationError.rack.length > 0 
+                  ? 'border-red-500' 
+                  : 'border-gray-300'
+              }`}
+              onBlur={(e) => setRack(e.target.value)}
+              disabled={loading}
+            />
+            {validationError && validationError.rack.length > 0 && <p className="text-red-500">{validationError.rack.join(", ")}</p>}
+          </div>
+          <div data-testid="word-input-container" className="flex flex-col gap-2">
+            <label>Word</label>
+            <input
+              type="text"
+              className={`w-[400px] p-2 border rounded-md ${
+                validationError && validationError.word.length > 0 
+                  ? 'border-red-500' 
+                  : 'border-gray-300'
+              }`}
+              onBlur={(e) => setWord(e.target.value)}
+              disabled={loading}
+            />
+            {validationError && validationError.word.length > 0 && <p className="text-red-500">{validationError.word.join(", ")}</p>}
+          </div>
+          <button
+            data-testid="play-button"
+            className="p-4 text-xl bg-blue-500 text-white p-2 rounded-md cursor-pointer drop-shadow-md"
+            onClick={handlePlay}
+            disabled={loading}
+          >
+            Play
+          </button>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div>Results</div>
+          <div data-testid="log-container" className="w-[400px] h-full flex flex-col items-center justify-center p-4 border rounded-md border-gray-300">
+            {loading && <p>Loading...</p>}
+            {validationError && validationError.game.length > 0 && (
+              <div className="text-red-500">
+                {validationError.game.map((err, idx) => (
+                  <p key={idx}>{err}</p>
+                ))}
+              </div>
+            )}
+            {bestWord && <p>Best word: {bestWord} : {score} points!</p>}
+          </div>
+        </div>
       </div>
-      <div className="flex flex-col items-center justify-center">
-        <label>Word</label>
-        <input type="text" className="w-full max-w-md p-2 border border-gray-300 rounded-md" onBlur={(e) => setWord(e.target.value)} disabled={loading} />
-      </div>
-        <button className="bg-blue-500 text-white p-2 rounded-md" onClick={handlePlay} disabled={loading}>Play</button>
-        {validationError && <p>Error: {validationError.message}</p>}
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
-        {bestWord && <p>Best word: {bestWord} : {score}</p>}
-      </div>
+    </div>
   )
 }
 
