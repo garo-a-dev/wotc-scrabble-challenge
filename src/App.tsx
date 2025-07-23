@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
+import type { FocusEvent } from 'react'
 import useFindWord, { type UseFindWordResult } from './hooks/useFindWord'
 import useValidation, { type UseFindValidationResult } from './hooks/useValidation'
 
-function App() {
+const App: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [rack, setRack] = useState<string>("")
   const [word, setWord] = useState<string>("")
 
-  const handlePlay = () => {
+  const handlePlay = (): void => {
     clearValidation()
     clearFindWord()
     setIsPlaying(true)
@@ -28,11 +29,14 @@ function App() {
     score,
     clearFindWord }: UseFindWordResult = useFindWord(rack, word, (isPlaying && isValid === true))
 
+  /* ---- EVENT HANDLERS ---- */
+  const handleRackBlur = (e: FocusEvent<HTMLInputElement>): void => setRack(e.target.value)
+  const handleWordBlur = (e: FocusEvent<HTMLInputElement>): void => setWord(e.target.value)
 
   /**
    * Cleanup useEffect that turns the playing state off in the case that the validation fails.
    */
-  useEffect(() => {
+  useEffect((): void => {
     if (!isPlaying) return;
 
     // Very important to do a specific false check here.
@@ -45,13 +49,14 @@ function App() {
   /**
    * Cleanup useEffect that turns the playing state off in the case that the best word is found or an error occurs.
    */
-  useEffect(() => {
+  useEffect((): void => {
     if (!isPlaying) return;
 
     if (bestWord || error) {
       setIsPlaying(false)
     }
   }, [bestWord, error, isPlaying, clearValidation])
+
 
   return (
     <div data-testid="app-container" className="w-full h-screen flex flex-col items-center justify-center gap-8">
@@ -67,7 +72,7 @@ function App() {
                   ? 'border-red-500' 
                   : 'border-gray-300'
               }`}
-              onBlur={(e) => setRack(e.target.value)}
+              onBlur={handleRackBlur}
               disabled={loading}
             />
             {validationError && validationError.rack.length > 0 && <p className="text-red-500">{validationError.rack.join(", ")}</p>}
@@ -81,7 +86,7 @@ function App() {
                   ? 'border-red-500' 
                   : 'border-gray-300'
               }`}
-              onBlur={(e) => setWord(e.target.value)}
+              onBlur={handleWordBlur}
               disabled={loading}
             />
             {validationError && validationError.word.length > 0 && <p className="text-red-500">{validationError.word.join(", ")}</p>}
@@ -101,11 +106,12 @@ function App() {
             {loading && <p>Loading...</p>}
             {validationError && validationError.game.length > 0 && (
               <div className="text-red-500">
-                {validationError.game.map((err, idx) => (
+                {validationError.game.map((err: string, idx: number) => (
                   <p key={idx}>{err}</p>
                 ))}
               </div>
             )}
+            {error && <p className="text-red-500">{error}</p>}
             {bestWord && <p>Best word: {bestWord} : {score} points!</p>}
           </div>
         </div>
