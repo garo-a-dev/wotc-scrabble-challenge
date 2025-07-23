@@ -52,6 +52,19 @@ describe('useFindWord', () => {
     });
   });
 
+  describe('tie-breaking on score', () => {
+    it('should return the alphabetically first word in case of a score tie', async () => {
+      // Both CAT and ACT have the same letters and (with standard Scrabble scoring) the same score.
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        text: () => Promise.resolve('CAT\nACT\nTAC'),
+      });
+      const { result } = renderHook(() => useFindWord('CAT', '', true));
+      await waitFor(() => expect(result.current.bestWord).not.toBeNull());
+      // Alphabetically, ACT < CAT < TAC
+      expect(result.current.bestWord).toBe('ACT');
+    });
+  });
+
   describe('clearFindWord', () => {
     it('should reset the state', async () => {
       const { result } = renderHook(() => useFindWord('CAT', '', true));

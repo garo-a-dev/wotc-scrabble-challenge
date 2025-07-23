@@ -31,7 +31,7 @@ const canForm = (candidate: string, rack: string, word: string): boolean => {
     const wordArr: string[] = word.split('');
     for (const l of wordArr) {
       const idx: number = candidateArr.indexOf(l);
-      if (idx === -1) return false;
+      if (idx === -1) return false;2
       candidateArr.splice(idx, 1);
     }
   }
