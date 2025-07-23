@@ -19,7 +19,7 @@ Please make sure your machine has the following installed:
 
 Within a terminal application:
 
-- Run `git clone` the project to your local machine and run `cd wotc-srabble-challenge`
+- `git clone` the project to your local machine and run `cd wotc-srabble-challenge`
 - Run `npm install` to install dependencies
 - Run `npm run dev` to start the local dev server
 - On any browser, visit: http://localhost:5173.
@@ -81,6 +81,6 @@ flowchart TD
 There are also tests written for the different hooks and components in this app. If you'd like to run them, simply run `npm test`. 
 The tests are using `jest` as the runner and use the different modules of `testing-library/react` to have tools to render and manipulate the differnet components.
 
-### Possible Optimizations
+## Possible Optimizations
 
-- Using a dictionary with under 300 words for now for initial implementation. For larger dictionaries, a chunking layer might be recommended to run multiple chunks in parallel and then compare the results.
+- Using a dictionary with under 300 words for initial implementation. For larger dictionaries, a chunking layer might be recommended to run multiple chunks in parallel and then compare the results.
